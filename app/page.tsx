@@ -1,6 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,7 +11,7 @@ import { Sidebar } from "@/components/sidebar"
 import { PatientForm } from "@/components/patient-form"
 import { PatientList } from "@/components/patient-list"
 import { PatientHistory } from "@/components/patient-history"
-import { Search, Plus, Users, Heart } from "lucide-react"
+import { Search, Plus, Users, Heart, Loader2 } from "lucide-react"
 
 export interface PatientNote {
   id: string
@@ -108,6 +110,15 @@ export default function HomePage() {
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null)
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null)
 
+  const { user, isLoading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login")
+    }
+  }, [user, isLoading, router])
+
   const filteredPatients = patients.filter((patient) => patient.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
   const handleAddPatient = (patientData: Omit<Patient, "id" | "createdAt" | "notes"> & { notes: string }) => {
@@ -202,6 +213,21 @@ export default function HomePage() {
   }
 
   const selectedPatient = selectedPatientId ? patients.find((p) => p.id === selectedPatientId) : null
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Cargando...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
 
   if (selectedPatient) {
     return (

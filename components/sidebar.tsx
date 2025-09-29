@@ -1,8 +1,9 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
-import { Users, Settings, Heart } from "lucide-react"
+import { Users, Settings, Heart, LogOut } from "lucide-react"
 
 const navigation = [
   {
@@ -22,6 +23,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ onNavigateToPatients }: SidebarProps) {
+  const { user, logout } = useAuth()
+
   return (
     <div className="flex h-full w-64 flex-col bg-sidebar border-r border-sidebar-border">
       {/* Logo */}
@@ -59,16 +62,25 @@ export function Sidebar({ onNavigateToPatients }: SidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-sidebar-border p-4">
+      <div className="border-t border-sidebar-border p-4 space-y-4">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
             <span className="text-sm font-medium text-primary">Dr</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-sidebar-foreground truncate">Dra. Psicóloga</p>
+            <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.name || "Usuario"}</p>
             <p className="text-xs text-sidebar-foreground/60 truncate">Profesional</p>
           </div>
         </div>
+
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-3 h-10 text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+          onClick={logout}
+        >
+          <LogOut className="h-4 w-4" />
+          Cerrar Sesión
+        </Button>
       </div>
     </div>
   )
